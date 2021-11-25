@@ -11,8 +11,8 @@ export default class Home extends React.Component {
           <Text>character list</Text>
 
           <Button
-            title = "View Characters"
-            onPress={() => navigate('CharacterList')} />
+            title = "View Characters" /** change CharacterDetail to CharacterList */
+            onPress={() => navigate('CharacterDetail')} />
 
           <StatusBar style="auto" />
         </View>

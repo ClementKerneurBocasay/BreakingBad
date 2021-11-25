@@ -7,10 +7,11 @@ import { Block, theme } from 'galio-framework';
 import CharacterListObject from '../components/CharacterListObject'
 import characterObject from '../constants/CharactersModel'
 
-const { width }  = Dimensions.get('window').width
-
 export default class CharacterList extends React.Component {
   renderCharacters = () => {        
+
+    const filteredCharactersList = characterObject.filter(character => character.category === "Breaking Bad")
+
       return (
 
         <ScrollView
@@ -19,15 +20,15 @@ export default class CharacterList extends React.Component {
         >
 
           <Block flex row>
-            <CharacterListObject characterObject = {characterObject[0]} horizontal />
+            <CharacterListObject characterObject = {filteredCharactersList[0]} horizontal />
             
             <Block flex row>
-              <CharacterListObject characterObject={characterObject[1]} style={{ marginRight: theme.SIZES.BASE }} />
-              <CharacterListObject characterObject={characterObject[2]} />
+              <CharacterListObject characterObject={filteredCharactersList[1]} style={{ marginRight: theme.SIZES.BASE }} />
+              <CharacterListObject characterObject={filteredCharactersList[2]} />
             </Block>
 
-            <CharacterListObject characterObject={characterObject[3]} horizontal />
-            <CharacterListObject characterObject={characterObject[4]} full />
+            <CharacterListObject characterObject={filteredCharactersList[3]} horizontal />
+            <CharacterListObject characterObject={filteredCharactersList[4]} full />
 
           </Block>
 

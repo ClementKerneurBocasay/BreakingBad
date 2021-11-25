@@ -1,37 +1,32 @@
 import React from 'react';
-import { StyleSheet, Dimensions, Image, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, Image, TouchableWithoutFeedback, View } from 'react-native';
 import { Block, Text, theme } from 'galio-framework';
-
-import CharacterObject from '../constants/CharactersModel'
 
 export default class CharacterListObject extends React.Component { 
     render () {
-        
-        const { navigation,  characterData, horizontal, full, style, imageStyle } = this.props;
-        const imageStyles = [styles.image, full ? styles.fullImage : styles.horizontalImage, imageStyle];
+        const { navigate, characterObject, horizontal, full, style, imageStyle } = this.props;
+        const imageStyles = [styles.image, full ? styles.fullImage : styles.horizontalImage, imageStyle]
 
         return (
-            <Block row={horizontal} card flex style={[styles.product, styles.shadow, style]}>
+          <Block row={horizontal} card flex style={[styles.product, styles.shadow, style]}>
 
-                <TouchableWithoutFeedback onPress={() => navigation.navigate('CharacterDetail')}>
+                <TouchableWithoutFeedback onPress={() => navigate('CharacterDetail')}>
 
                     <Block flex style={[styles.imageContainer, styles.shadow]}>
-                        <Image source={{ uri: characterData.img }} style={imageStyles} />
+                        <Image source={{ uri: characterObject.img }} style={imageStyles} />
                     </Block>
 
                 </TouchableWithoutFeedback>
 
-                <TouchableWithoutFeedback onPress={() => navigation.navigate('CharacterDetail')}>
+                <TouchableWithoutFeedback onPress={() => navigate('CharacterDetail')}>
 
                     <Block flex space="between" style={styles.productDescription}>
-
-                        <Text size={14} style={styles.productTitle}>{characterData.name}</Text>
-                        
+                        <Text size={14} style={styles.productTitle}>{characterObject.name}</Text>
                     </Block>
 
-                </TouchableWithoutFeedback>
-
-            </Block>
+                </TouchableWithoutFeedback> 
+                
+          </Block>       
         );
 
     }
