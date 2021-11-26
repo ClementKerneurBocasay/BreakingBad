@@ -1,113 +1,123 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { ScrollView } from 'react-native-gesture-handler';
-import {StyleSheet, Dimensions} from 'react-native';
-import { Block, theme } from 'galio-framework';
-
-import CharacterListObject from '../components/CharacterListObject'
-import characterObject from '../constants/CharactersModel'
+import React, { useState }  from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, Image, FlatList, ActivityIndicator } from 'react-native';
 
 export default class CharacterList extends React.Component {
-  renderCharacters = () => {        
 
-    const filteredCharactersList = characterObject.filter(character => character.category === "Breaking Bad")
+  constructor(props) { 
+    super(props)
 
+    this.state = {  
+      isLoading: true,
+      dataSource: []
+    }
+  }
+
+   componentDidMount() {
+    fetch('https://breakingbadapi.com/api/characters', {
+      method: 'GET',
+      //Request Type
+    })
+  
+      .then((response) => response.json())
+      //If response is in json then in success
+      .then((responseJson) => {
+
+        this.setState({
+          isLoading: false,
+          dataSource: responseJson
+        })
+
+      })
+  
+      //If response is not in json then in error
+      .catch((error) => {
+        //Error
+        console.error(error);
+      });
+    }
+
+  _renderItem = ({item,index}) => {
+    const { navigate } = this.props.navigation
+
+    return (
+      <TouchableOpacity onPress = { () => navigate('CharacterDetail')  } >
+
+        <View>
+        
+          <Image 
+           style = {styles.image}
+           source = {{uri: item.img}}/>
+          <Text style = {styles.speakerBio}  >{item.name}</Text>
+
+      </View>
+
+      </TouchableOpacity>
+    )
+  }
+
+  render () { 
+    let { dataSource, isLoading} = this.state
+    
+
+    if(isLoading){ 
       return (
-
-        <ScrollView
-          showsVerticalScrollIndicator = {true}
-          contentContainerStyle={styles.products}
-        >
-
-          <Block flex row>
-            <CharacterListObject characterObject = {filteredCharactersList[0]} horizontal />
-            
-            <Block flex row>
-              <CharacterListObject characterObject={filteredCharactersList[1]} style={{ marginRight: theme.SIZES.BASE }} />
-              <CharacterListObject characterObject={filteredCharactersList[2]} />
-            </Block>
-
-            <CharacterListObject characterObject={filteredCharactersList[3]} horizontal />
-            <CharacterListObject characterObject={filteredCharactersList[4]} full />
-
-          </Block>
-
-        </ScrollView>
-      );
+        <View style={styles.container} >
+          <ActivityIndicator size="large" animating />
+        </View>
+      ) 
     } 
 
-    render() {
-      return (
-        <Block flex center style={styles.home}>
-          {this.renderCharacters()}
-        </Block>
-      );
-    }
-}
+    return (
+      <View style={styles.container}>
+        <FlatList
+          data = {dataSource}
+          renderItem={this._renderItem}
+          keyExtractor={(item, index) => index.toString()}
+        />
+      </View>
+    )
 
+   }
 
+} 
+
+const IMAGE_SIZE = 80;
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    padding: 20,
   },
 
-  home: {
-    width: 'auto',    
+  textStyle: {
+    fontSize: 18,
+    color: 'white',
   },
 
-  search: {
-    height: 48,
-    width: 'auto' - 32,
+  item: {
+    backgroundColor: '#f9c2ff',
+    padding: 20,
+    marginVertical: 8,
     marginHorizontal: 16,
-    borderWidth: 1,
-    borderRadius: 3,
   },
 
-  header: {
-    backgroundColor: theme.COLORS.WHITE,
-    shadowColor: theme.COLORS.BLACK,
-    shadowOffset: {
-      width: 0,
-      height: 2
-    },
-
-    shadowRadius: 8,
-    shadowOpacity: 0.2,
-    elevation: 4,
-    zIndex: 2,
+  title: {
+    fontSize: 32,
   },
 
-  tabs: {
-    marginBottom: 24,
-    marginTop: 10,
-    elevation: 4,
+  buttonStyle: {
+    alignItems: 'center',
+    backgroundColor: '#f4511e',
+    padding: 10,
+    marginVertical: 10,
   },
 
-  tab: {
-    backgroundColor: theme.COLORS.TRANSPARENT,
-    width: 'auto' * 0.50,
-    borderRadius: 0,
-    borderWidth: 0,
-    height: 24,
-    elevation: 0,
-  },
-
-  tabTitle: {
-    lineHeight: 19,
-    fontWeight: '300'
-  },
-
-  divider: {
-    borderRightWidth: 0.3,
-    borderRightColor: theme.COLORS.MUTED,
-  },
-
-  products: {
-    width: 'auto' - theme.SIZES.BASE * 2,
-    paddingVertical: theme.SIZES.BASE * 2,
+  image: {
+    width: IMAGE_SIZE,
+    height: IMAGE_SIZE,
+    borderRadius: IMAGE_SIZE/2,
+    backgroundColor: "grey",
+    marginRight: 10,
   },
 
 });
