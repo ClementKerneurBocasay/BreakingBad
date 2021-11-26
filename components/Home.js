@@ -12,7 +12,7 @@ export default class Home extends React.Component {
 
           <Button
             title = "View Characters" /** change CharacterDetail to CharacterList */
-            onPress={() => navigate('CharacterDetail')} />
+            onPress={() => navigate('CharacterList')} />
 
           <StatusBar style="auto" />
         </View>

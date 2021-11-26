@@ -1,113 +1,119 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { ScrollView } from 'react-native-gesture-handler';
-import {StyleSheet, Dimensions} from 'react-native';
-import { Block, theme } from 'galio-framework';
+import React, { useState }  from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
+import { FlatList } from 'react-native-gesture-handler';
 
-import CharacterListObject from '../components/CharacterListObject'
-import characterObject from '../constants/CharactersModel'
+import { SafeAreaView } from 'react-navigation';
 
-export default class CharacterList extends React.Component {
-  renderCharacters = () => {        
+const CharacterList = () => {
 
-    const filteredCharactersList = characterObject.filter(character => character.category === "Breaking Bad")
+const [data, setData] = useState([]);
 
-      return (
+//API call to fetch 
+const fetchDataUsingGet = () => {
 
-        <ScrollView
-          showsVerticalScrollIndicator = {true}
-          contentContainerStyle={styles.products}
-        >
+  //GET request
+  fetch('https://breakingbadapi.com/api/characters', {
+    method: 'GET',
+    //Request Type
+  })
 
-          <Block flex row>
-            <CharacterListObject characterObject = {filteredCharactersList[0]} horizontal />
-            
-            <Block flex row>
-              <CharacterListObject characterObject={filteredCharactersList[1]} style={{ marginRight: theme.SIZES.BASE }} />
-              <CharacterListObject characterObject={filteredCharactersList[2]} />
-            </Block>
+    .then((response) => response.json())
+    //If response is in json then in success
+    .then((responseJson) => {
+      //Success
+      const json = JSON.stringify(responseJson);
+      setData(json);
+      //alert(json); //This creates a dialog 
+    })
 
-            <CharacterListObject characterObject={filteredCharactersList[3]} horizontal />
-            <CharacterListObject characterObject={filteredCharactersList[4]} full />
+    //If response is not in json then in error
+    .catch((error) => {
+      //Error
+      console.error(error);
+    });
 
-          </Block>
+};
 
-        </ScrollView>
-      );
-    } 
+const ItemCharacter = ({ name, img }) => (
+  <View style={styles.item}>
 
-    render() {
-      return (
-        <Block flex center style={styles.home}>
-          {this.renderCharacters()}
-        </Block>
-      );
-    }
+    <Text style={styles.title}>{name}</Text>
+
+    <Image 
+     style = {styles.image}
+     source= {{ uri: img }}/>
+  </View>
+);
+
+const renderItem = ({ item }) => (
+  <ItemCharacter name = {item.name, item.img} />
+);
+
+  return (
+    <SafeAreaView style={{ flex: 1 }} >
+      <View style={styles.container}>
+        
+        <View style={styles.container}>
+
+          <TouchableOpacity
+            style={styles.buttonStyle}
+            onPress={fetchDataUsingGet}>
+            <Text style={styles.textStyle}>Get Data Using GET</Text>
+          </TouchableOpacity>
+
+          <FlatList
+            data = {data}
+            renderItem = { item => renderItem(item) }
+            keyExtractor={ item => item.char_id }
+          />
+
+        </View>
+
+      </View>
+    </SafeAreaView>
+  );
+  
 }
 
+export default CharacterList;
 
+const IMAGE_SIZE = 80;
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    padding: 20,
   },
 
-  home: {
-    width: 'auto',    
+  textStyle: {
+    fontSize: 18,
+    color: 'white',
   },
 
-  search: {
-    height: 48,
-    width: 'auto' - 32,
+  item: {
+    backgroundColor: '#f9c2ff',
+    padding: 20,
+    marginVertical: 8,
     marginHorizontal: 16,
-    borderWidth: 1,
-    borderRadius: 3,
   },
 
-  header: {
-    backgroundColor: theme.COLORS.WHITE,
-    shadowColor: theme.COLORS.BLACK,
-    shadowOffset: {
-      width: 0,
-      height: 2
-    },
-
-    shadowRadius: 8,
-    shadowOpacity: 0.2,
-    elevation: 4,
-    zIndex: 2,
+  title: {
+    fontSize: 32,
   },
 
-  tabs: {
-    marginBottom: 24,
-    marginTop: 10,
-    elevation: 4,
+  buttonStyle: {
+    alignItems: 'center',
+    backgroundColor: '#f4511e',
+    padding: 10,
+    marginVertical: 10,
   },
 
-  tab: {
-    backgroundColor: theme.COLORS.TRANSPARENT,
-    width: 'auto' * 0.50,
-    borderRadius: 0,
-    borderWidth: 0,
-    height: 24,
-    elevation: 0,
-  },
-
-  tabTitle: {
-    lineHeight: 19,
-    fontWeight: '300'
-  },
-
-  divider: {
-    borderRightWidth: 0.3,
-    borderRightColor: theme.COLORS.MUTED,
-  },
-
-  products: {
-    width: 'auto' - theme.SIZES.BASE * 2,
-    paddingVertical: theme.SIZES.BASE * 2,
+  image: {
+    width: IMAGE_SIZE,
+    height: IMAGE_SIZE,
+    borderRadius: IMAGE_SIZE/2,
+    backgroundColor: "grey",
+    marginRight: 10,
   },
 
 });
