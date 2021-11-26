@@ -1,81 +1,85 @@
 import React, { useState }  from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
+import { StyleSheet, Text, View, TouchableOpacity, Image, FlatList, ActivityIndicator } from 'react-native';
 
-import { SafeAreaView } from 'react-navigation';
+export default class CharacterList extends React.Component {
 
-const CharacterList = () => {
+  constructor(props) { 
+    super(props)
 
-const [data, setData] = useState([]);
+    this.state = {  
+      isLoading: true,
+      dataSource: []
+    }
+  }
 
-//API call to fetch 
-const fetchDataUsingGet = () => {
-
-  //GET request
-  fetch('https://breakingbadapi.com/api/characters', {
-    method: 'GET',
-    //Request Type
-  })
-
-    .then((response) => response.json())
-    //If response is in json then in success
-    .then((responseJson) => {
-      //Success
-      const json = JSON.stringify(responseJson);
-      setData(json);
-      //alert(json); //This creates a dialog 
+   componentDidMount() {
+    fetch('https://breakingbadapi.com/api/characters', {
+      method: 'GET',
+      //Request Type
     })
+  
+      .then((response) => response.json())
+      //If response is in json then in success
+      .then((responseJson) => {
 
-    //If response is not in json then in error
-    .catch((error) => {
-      //Error
-      console.error(error);
-    });
+        this.setState({
+          isLoading: false,
+          dataSource: responseJson
+        })
 
-};
+      })
+  
+      //If response is not in json then in error
+      .catch((error) => {
+        //Error
+        console.error(error);
+      });
+    }
 
-const ItemCharacter = ({ name, img }) => (
-  <View style={styles.item}>
+  _renderItem = ({item,index}) => {
+    const { navigate } = this.props.navigation
 
-    <Text style={styles.title}>{name}</Text>
+    return (
+      <TouchableOpacity onPress = { () => navigate('CharacterDetail')  } >
 
-    <Image 
-     style = {styles.image}
-     source= {{ uri: img }}/>
-  </View>
-);
-
-const renderItem = ({ item }) => (
-  <ItemCharacter name = {item.name, item.img} />
-);
-
-  return (
-    <SafeAreaView style={{ flex: 1 }} >
-      <View style={styles.container}>
+        <View>
         
-        <View style={styles.container}>
-
-          <TouchableOpacity
-            style={styles.buttonStyle}
-            onPress={fetchDataUsingGet}>
-            <Text style={styles.textStyle}>Get Data Using GET</Text>
-          </TouchableOpacity>
-
-          <FlatList
-            data = {data}
-            renderItem = { item => renderItem(item) }
-            keyExtractor={ item => item.char_id }
-          />
-
-        </View>
+          <Image 
+           style = {styles.image}
+           source = {{uri: item.img}}/>
+          <Text style = {styles.speakerBio}  >{item.name}</Text>
 
       </View>
-    </SafeAreaView>
-  );
-  
-}
 
-export default CharacterList;
+      </TouchableOpacity>
+    )
+  }
+
+  render () { 
+    let { dataSource, isLoading} = this.state
+    
+
+    if(isLoading){ 
+      return (
+        <View style={styles.container} >
+          <ActivityIndicator size="large" animating />
+        </View>
+      ) 
+    } 
+
+    return (
+      <View style={styles.container}>
+        <FlatList
+          data = {dataSource}
+          renderItem={this._renderItem}
+          keyExtractor={(item, index) => index.toString()}
+        />
+      </View>
+    )
+
+   }
+
+} 
 
 const IMAGE_SIZE = 80;
 const styles = StyleSheet.create({
