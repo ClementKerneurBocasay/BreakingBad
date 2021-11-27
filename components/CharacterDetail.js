@@ -1,37 +1,94 @@
-import React from 'react';
+import React,{ useState }  from 'react';
 import { StyleSheet, Text, View, Image } from 'react-native';
+import { FlatList } from 'react-native-gesture-handler';
 
 /** URL Tutorial : https://www.youtube.com/watch?v=xVOT0cxFhzA */
 
 export default class CharacterDetail extends React.Component {
- render() {  
-        return (
-            <View style={styles.container}>
-              
-              <View style = {styles.detailsContainer}>
-                <Text style = {styles.title}> Title </Text>
-                <Text style = {styles.subtitle} > subti </Text>
-                <Text style = {styles.description} > zafer lap marser !! </Text>
-              </View>
 
-              <View style = {styles.speakerContainer}>
-                <Image
-                style = {styles.image}
-                source = {{uri: "https://vignette.wikia.nocookie.net/breakingbad/images/9/95/JesseS5.jpg/revision/latest?cb=20120620012441"}}
-                />
+  constructor(props) { 
+    super(props)
 
-                <View>
-                  <Text style = {styles.speakerName}> Breaking Bad </Text>
-                  <Text style = {styles.speakerBio}> is Working haha</Text>
-                </View>
-              </View>
+    this.state = {  
+      isLoading: true,
+      characterQuote: []
+    }
+  }
 
-            </View>
-          );
-    } 
+  componentDidMount () {
+    this.fetchCharacterQuote()
+  }
+
+  renderOccupation = ({item,index}) => {
+    return (
+      <View>
+          <Text style = {styles.description} >{item}</Text>
+      </View>
+    )
+  }
+
+  fetchCharacterQuote () {
+    fetch('https://breakingbadapi.com/api/quotes', {
+      method: 'GET',
+      //Request Type
+    })
+  
+      .then((response) => response.json())
+      //If response is in json then in success
+      .then((responseJson) => {
+
+        this.setState({
+          isLoading: false,
+          characterQuote: responseJson
+        })
+
+      })
+  
+      //If response is not in json then in error
+      .catch((error) => {
+        //Error
+        console.error(error);
+      });
+  }
+
+  render() {
+    const characterData = this.props.route.params
+
+    return (
+      <View style={styles.container}>
+
+        <View style={styles.speakerContainer}>
+          <Image
+            style={styles.image}
+            source={{ uri: characterData.img }}
+          />
+
+          <View>
+            <Text style={styles.speakerName}> {characterData.name} </Text>
+            <Text style={styles.speakerBio}> Portrayed by {characterData.portrayed}</Text>
+          </View>
+        </View>
+
+        <View style={styles.detailsContainer}>
+          <Text style={styles.description} > Birthday : {characterData.birthday} </Text>
+          <Text style={styles.description} > Nickname : {characterData.nickname} </Text>
+          <Text style={styles.description} > Current Status : {characterData.status} </Text>
+
+
+          <Text style={styles.description} > Occupation :</Text>
+          <FlatList style={styles.description} 
+            data = {characterData.occupation}
+            renderItem = {this.renderOccupation}
+            keyExtractor={(item, index) => index.toString()}/> 
+
+        </View>
+
+      </View>
+    );
+  }
 }
 
-const IMAGE_SIZE = 80;
+const IMAGE_SIZE = 100;
 
 const styles = StyleSheet.create({
   container: {
@@ -71,19 +128,20 @@ const styles = StyleSheet.create({
   image: {
     width: IMAGE_SIZE,
     height: IMAGE_SIZE,
-    borderRadius: IMAGE_SIZE/2,
+    borderRadius: IMAGE_SIZE / 2,
     backgroundColor: "grey",
     marginRight: 10,
   },
 
   speakerName: {
     color: 'purple',
-    fontSize: 18,
+    fontSize: 30,
     fontWeight: '500',
   },
 
   speakerBio: {
-    fontSize: 13,
+    fontSize: 15,
+    fontWeight: "500"
   },
 
 });
