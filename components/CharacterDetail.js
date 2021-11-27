@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View, Image, Button } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FlatList, TextInput } from 'react-native-gesture-handler';
 
 /** URL Tutorial : https://www.youtube.com/watch?v=xVOT0cxFhzA */
@@ -19,6 +20,20 @@ export default class CharacterDetail extends React.Component {
 
   componentDidMount() {
     this.fetchCharacterQuotes()
+    this.getData()
+  }
+
+  setData(data){
+    if(data === "") alert('Please feed data before saving!')
+    else { 
+      AsyncStorage.setItem('userComment',data) 
+      alert('saved')}
+  }
+
+  getData(){
+   this.setState({
+      userComment: AsyncStorage.getItem('userComment')
+    })
   }
 
   renderOccupation = ({ item, index }) => {
@@ -119,11 +134,13 @@ export default class CharacterDetail extends React.Component {
           <TextInput
             multiline
             keyboardType = 'default'
+            value = { this.state.userComment}
             onChangeText = { (text) => this.saveUserComment(text) }
             style = {styles.input}/>
 
           <Button 
-            title = "Save Comment" />
+            title = "Save Comment" 
+            onPress = { () => this.setData(this.state.userComment) }/>
         </View>
 
       </View>
