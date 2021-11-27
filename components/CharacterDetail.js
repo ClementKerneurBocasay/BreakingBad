@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { StyleSheet, Text, View, Image, Button } from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
+import { FlatList, TextInput } from 'react-native-gesture-handler';
 
 /** URL Tutorial : https://www.youtube.com/watch?v=xVOT0cxFhzA */
 
@@ -13,6 +13,7 @@ export default class CharacterDetail extends React.Component {
       isLoading: true,
       quote: "",
       characterQuote: [],
+      userComment: "",
     }
   }
 
@@ -28,6 +29,7 @@ export default class CharacterDetail extends React.Component {
     )
   }
 
+  /** Fetch Quote for character from API */
   fetchCharacterQuotes() {
     fetch('https://breakingbadapi.com/api/quotes', {
       method: 'GET',
@@ -57,6 +59,18 @@ export default class CharacterDetail extends React.Component {
     this.setState({
       quote: filteredCharacterQuotes[Math.floor(Math.random()*filteredCharacterQuotes.length)].quote
     })
+  }
+
+  /** Save comment inserted by user */
+  saveUserComment(textInput){
+    this.setState({
+      userComment: textInput
+    })
+  }
+
+  saveCommentLocally(){
+   const userComment =  this.state.userComment
+   if(userComment === ""){ alert("Please insert a comment before saving!") }
   }
 
   render() {
@@ -95,8 +109,21 @@ export default class CharacterDetail extends React.Component {
           <Text style={styles.subtitle} > Quote </Text>
           <Text style={styles.quote} > {this.state.quote}</Text>
           <Button
-          title= "Refresh Quote"
-          onPress = { () => this.fetchRandomValue(filteredCharacterQuotes) } />
+            title= "Refresh Quote"
+            onPress = { () => this.fetchRandomValue(filteredCharacterQuotes) } />
+        </View>
+
+        <View>
+          <Text style={styles.subtitle} > Insert a comment </Text>
+
+          <TextInput
+            multiline
+            keyboardType = 'default'
+            onChangeText = { (text) => this.saveUserComment(text) }
+            style = {styles.input}/>
+
+          <Button 
+            title = "Save Comment" />
         </View>
 
       </View>
@@ -165,4 +192,14 @@ const styles = StyleSheet.create({
     fontWeight: "500"
   },
 
+  input: {
+    borderWidth:1,
+    borderColor: '#777',
+    padding: 8,
+    margin: 10,
+    height: 100,
+    width: 'auto',
+  },
+
 });
+
