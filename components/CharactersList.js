@@ -40,7 +40,7 @@ export default class CharacterList extends React.Component {
     const { navigate } = this.props.navigation
 
     return (
-      <TouchableOpacity onPress = { () => this.props.navigation.navigate('CharacterDetail', item ) } >
+      <TouchableOpacity onPress = { () => navigate('CharacterDetail', item ) } >
 
         <View>
         

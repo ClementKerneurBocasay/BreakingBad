@@ -20,23 +20,25 @@ export default class CharacterDetail extends React.Component {
 
   componentDidMount() {
     this.fetchCharacterQuotes()
-    this.getData()
+    this.getComment()
   }
 
-  setData(data){
+  setComment(data){
     if(data === "") alert('Please feed data before saving!')
-    else { 
-      AsyncStorage.setItem('userComment',data) 
-      alert('saved')}
+    else {
+      AsyncStorage.setItem('userComment',data)
+      this.setState({ userComment: data })
+      alert('saved')
+    }
   }
 
-  getData(){
+  async getComment(){
    this.setState({
-      userComment: AsyncStorage.getItem('userComment')
+      userComment: await AsyncStorage.getItem('userComment')
     })
   }
 
-  renderOccupation = ({ item, index }) => {
+  renderOccupation = ({ item }) => {
     return (
       <View>
         <Text style={styles.description} >{item}</Text>
@@ -92,6 +94,7 @@ export default class CharacterDetail extends React.Component {
     const characterData = this.props.route.params
     /** Filter quotes by character */
     const filteredCharacterQuotes = this.state.characterQuote.filter(i => i.author === characterData.name)
+    const characterHasQuotes = !!filteredCharacterQuotes.length
 
     return (
       <View style={styles.container}>
@@ -120,13 +123,13 @@ export default class CharacterDetail extends React.Component {
             keyExtractor={(item, index) => index.toString()} />
         </View>
 
-        <View>
+        {characterHasQuotes && <View>
           <Text style={styles.subtitle} > Quote </Text>
           <Text style={styles.quote} > {this.state.quote}</Text>
           <Button
             title= "Refresh Quote"
             onPress = { () => this.fetchRandomValue(filteredCharacterQuotes) } />
-        </View>
+        </View>}
 
         <View>
           <Text style={styles.subtitle} > Insert a comment </Text>
@@ -140,7 +143,7 @@ export default class CharacterDetail extends React.Component {
 
           <Button 
             title = "Save Comment" 
-            onPress = { () => this.setData(this.state.userComment) }/>
+            onPress = { () => this.setComment(this.state.userComment) }/>
         </View>
 
       </View>
@@ -216,7 +219,7 @@ const styles = StyleSheet.create({
     margin: 10,
     height: 100,
     width: 'auto',
-  },
+  }
 
 });
 
